@@ -47,3 +47,54 @@ k4.metric("평균 마진율 (%)", f"{filtered['Operating Margin'].mean():.2f}")
 
 # 탭(Tab) 레이아웃 구성
 tab1, tab2, tab3 = st.tabs(["트렌드 및 분포", "소매점/제품", "심화 분석"])
+
+# 트렌드 및 분포 시각화
+with tab1:
+    c1, c2 = st.columns([2,1])
+    with c1:
+        st.markdown("#### 월별 판매 트렌드")
+        monthly = filtered.groupby([filtered["Invoice Date"].dt.to_period("M")]).agg({
+            "Units Sold": "sum",
+            "Total Sales": "sum"
+        }).reset_index()
+        monthly["Invoice Date"] = monthly["Invoice Date"].dt.to_timestamp()
+        st.line_chart(
+            monthly.set_index("Invoice Date")[["Units Sold", "Total Sales"]],
+            use_container_width=True
+        )
+    with c2:
+        st.markdown("#### 판매방법 비율")
+        method_counts = filtered["Sales Method"].value_counts()
+        pie_fig = go.Figure(
+            data=[go.Pie(
+                labels=method_counts.index,
+                values=method_counts.values,
+                hole=0.3
+            )]
+        )
+        pie_fig.update_layout(title_text="Sales Method Share")
+        st.plotly_chart(pie_fig, use_container_width=True)
+
+    st.markdown("#### 제품-지역별 판매 히트맵")
+    import plotly.express as px
+    heatmap_data = pd.pivot_table(
+        filtered,
+        index="Product",
+        columns="Region",
+        values="Units Sold",
+        aggfunc="sum"
+    ).fillna(0)
+    if not heatmap_data.empty:
+        heatmap_fig = px.imshow(
+            heatmap_data.values,
+            labels=dict(x="Region", y="Product", color="Units Sold"),
+            x=heatmap_data.columns,
+            y=heatmap_data.index,
+            color_continuous_scale="YlGnBu",
+            text_auto=True,
+            aspect="auto",
+            title="Units Sold by Product and Region"
+        )
+        st.plotly_chart(heatmap_fig, use_container_width=True)
+    else:
+        st.info("No data to display for heatmap.")
