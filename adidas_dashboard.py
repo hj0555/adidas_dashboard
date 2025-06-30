@@ -124,3 +124,38 @@ with tab2:
         aggfunc="sum"
     ).fillna(0)
     st.dataframe(pivot.astype(int))
+
+# 심화 분석
+with tab3:
+    c5, c6 = st.columns(2)
+    with c5:
+        st.markdown("#### 판매방법별 평균 마진율")
+        method_stats = filtered.groupby("Sales Method").agg({
+            "Profit Rate":"mean"
+        }).sort_values("Profit Rate", ascending=False)
+        st.bar_chart(method_stats, use_container_width=True)
+    with c6:
+        st.markdown("#### 판매방법별 평균 단가")
+        method_stats2 = filtered.groupby("Sales Method").agg({
+            "Price per Unit":"mean"
+        }).sort_values("Price per Unit", ascending=False)
+        st.bar_chart(method_stats2, use_container_width=True)
+
+    st.markdown("#### 단가-판매수량 산점도")
+    import plotly.express as px
+    if not filtered.empty:
+        scatter_fig = px.scatter(
+            filtered,
+            x="Price per Unit",
+            y="Units Sold",
+            title="Price per Unit vs Units Sold",
+            opacity=0.5,
+            color="Sales Method",
+            height=300
+        )
+        st.plotly_chart(scatter_fig, use_container_width=True)
+    else:
+        st.info("No data to display for scatter plot.")
+
+    with st.expander("데이터 미리보기"):
+        st.dataframe(filtered.head(20))
