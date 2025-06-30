@@ -1,0 +1,19 @@
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+import plotly.graph_objects as go
+
+st.set_page_config(page_title="Adidas US Sales Dashboard", layout="wide")
+st.title("👟 Adidas US Sales Data Dashboard")
+
+# 데이터 불러오기 및 전처리
+data = pd.read_csv("https://raw.githubusercontent.com/myoh0623/dataset/refs/heads/main/adidas_us_sales_datasets.csv")
+data.columns = data.columns.str.strip()
+for col in ["Price per Unit", "Total Sales", "Operating Profit"]:
+    data[col] = data[col].replace('[\\$,]', '', regex=True).astype(float)
+data["Units Sold"] = data["Units Sold"].replace('[,]', '', regex=True).astype(int)
+data["Operating Margin"] = data["Operating Margin"].replace('[\\%,]', '', regex=True).astype(float)
+data["Invoice Date"] = pd.to_datetime(data["Invoice Date"], errors="coerce")
+data = data.dropna(subset=["Invoice Date"])
