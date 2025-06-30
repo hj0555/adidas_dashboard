@@ -98,3 +98,29 @@ with tab1:
         st.plotly_chart(heatmap_fig, use_container_width=True)
     else:
         st.info("No data to display for heatmap.")
+
+# 소매점/제품 분석
+with tab2:
+    c3, c4 = st.columns(2)
+    with c3:
+        st.markdown("#### 소매점별 판매수량")
+        retail_sales = filtered.groupby("Retailer").agg({"Units Sold":"sum"}).sort_values("Units Sold", ascending=False)
+        st.bar_chart(retail_sales, use_container_width=True)
+    with c4:
+        st.markdown("#### 소매점별 매출액")
+        retail_sales2 = filtered.groupby("Retailer").agg({"Total Sales":"sum"}).sort_values("Total Sales", ascending=False)
+        st.bar_chart(retail_sales2, use_container_width=True)
+
+    st.markdown("#### 제품별 판매수량 TOP")
+    prod_sales = filtered.groupby("Product").agg({"Units Sold":"sum"}).sort_values("Units Sold", ascending=False)
+    st.bar_chart(prod_sales, use_container_width=True)
+
+    st.markdown("#### 월별-제품별 판매 피벗테이블")
+    pivot = pd.pivot_table(
+        filtered,
+        index=filtered["Invoice Date"].dt.to_period("M"),
+        columns="Product",
+        values="Units Sold",
+        aggfunc="sum"
+    ).fillna(0)
+    st.dataframe(pivot.astype(int))
