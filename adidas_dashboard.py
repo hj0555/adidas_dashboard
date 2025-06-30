@@ -44,3 +44,6 @@ k1.metric("총 매출액 ($)", f"{filtered['Total Sales'].sum():,.0f}")
 k2.metric("총 판매수량", f"{filtered['Units Sold'].sum():,}")
 k3.metric("평균 단가 ($)", f"{filtered['Price per Unit'].mean():.2f}")
 k4.metric("평균 마진율 (%)", f"{filtered['Operating Margin'].mean():.2f}")
+
+# 탭(Tab) 레이아웃 구성
+tab1, tab2, tab3 = st.tabs(["트렌드 및 분포", "소매점/제품", "심화 분석"])
