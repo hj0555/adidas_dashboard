@@ -17,3 +17,8 @@ data["Units Sold"] = data["Units Sold"].replace('[,]', '', regex=True).astype(in
 data["Operating Margin"] = data["Operating Margin"].replace('[\\%,]', '', regex=True).astype(float)
 data["Invoice Date"] = pd.to_datetime(data["Invoice Date"], errors="coerce")
 data = data.dropna(subset=["Invoice Date"])
+
+# 파생 변수 생성
+data["Profit Rate"] = data["Operating Margin"] * 0.01
+data["Year"] = data["Invoice Date"].dt.year
+data["Month"] = data["Invoice Date"].dt.month
